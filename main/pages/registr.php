@@ -1,3 +1,36 @@
+<?php 
+session_start();
+if (isset($_SESSION['id'])){
+    header('Location: main_page.php');
+}
+if ($_SERVER['REQUEST_METHOD'] == "POST" and !empty($_POST)){
+    include('../php/users.php');
+    include('../php/config.php');
+    if ($_POST['email'] == '' or $_POST['password'] == ''){
+        $error = 'Вы не заполнили обязательные поля';
+    }else if(strlen($_POST['password']) < 5){
+        $error = 'Недостаточная длина пароля';
+    }
+    $users = new Users($pdo1);
+    $email = trim($_POST['email']);
+    $password1 = $_POST['password'];
+    $confirm_pass = $_POST['confirm-password'];
+
+    if ($confirm_pass != $password1){
+        $error = 'Повтор пароля неверен';
+    }
+
+    if (($users->check_email($email) == false)){
+        $error = 'пользователь с таким логином уже существует';
+    }
+
+    if (!isset($error)){
+        $users->add($email, $password);
+        header('Location: index.php');
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,12 +43,12 @@
     <div class="auth-container">
         <div id="register-form">
             <h2>Регистрация</h2>
-            <form action="/register" method="POST">
+            <form action="registr.php" method="POST">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required placeholder="Введите ваш email">
 
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password" required minlength="3" placeholder="Введите ваш пароль">
+                <input type="password" id="password" name="password" required minlength="4" placeholder="Введите ваш пароль">
 
                 <label for="confirm-password">Подтвердите пароль:</label>
                 <input type="password" id="confirm-password" name="confirm-password" required placeholder="Подтвердите пароль">
@@ -25,7 +58,11 @@
                 <p>Уже есть аккаунт? <a href="index.php">Войдите</a></p>
             </form>
             <!-- Ошибка регистрации -->
-            <div id="register-error" style="color: red;"></div>
+            <div id="register-error" style="color: red;">
+            <?php if (isset($error)){
+                    echo($error);
+                }?>
+            </div>
         </div>
     </div>
 
