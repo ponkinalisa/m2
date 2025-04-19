@@ -6,16 +6,24 @@ if (isset($_SESSION['id'])){
 if ($_SERVER['REQUEST_METHOD'] == "POST" and !empty($_POST)){
     include('../php/users.php');
     include('../php/config.php');
-    if ($_POST['email'] == '' or $_POST['password'] == ''){
+    if ($_POST['email'] == ''){
+        $email_error = 1;
         $error = 'Вы не заполнили обязательные поля';
-    }else if(strlen($_POST['password']) < 5){
+    }if ($_POST['password'] == ''){
+        $pass_error = 1;
+        $error = 'Вы не заполнили обязательные поля';
+    }if(strlen($_POST['password']) < 5){
+        $pass_error = 1;
         $error = 'Недостаточная длина пароля';
     }
     $users = new Users($pdo1);
     $email = trim($_POST['email']);
     $password1 = $_POST['password'];
     $confirm_pass = $_POST['confirm-password'];
-
+    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        $email_error = 1;
+        $error = 'Формат почты неправильный';
+    }
     if ($confirm_pass != $password1){
         $error = 'Повтор пароля неверен';
     }
@@ -25,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" and !empty($_POST)){
     }
 
     if (!isset($error)){
-        $users->add($email, $password);
+        $users->add(htmlspecialchars($email), htmlspecialchars($password1));
         header('Location: index.php');
     }
 }

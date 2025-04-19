@@ -6,22 +6,35 @@ if (isset($_SESSION['id'])){
 if ($_SERVER['REQUEST_METHOD'] == "POST" and !empty($_POST)){
     include('../php/users.php');
     include('../php/config.php');
-    if ($_POST['email'] == '' or $_POST['password'] == ''){
+    if ($_POST['email'] == ''){
+        $email_error = 1;
         $error = 'Вы не заполнили обязательные поля';
-    }else if(strlen($_POST['password']) < 5){
+    }if ($_POST['password'] == ''){
+        $pass_error = 1;
+        $error = 'Вы не заполнили обязательные поля';
+    }if(strlen($_POST['password']) < 5){
+        $pass_error = 1;
         $error = 'Недостаточная длина пароля';
     }
     $users = new Users($pdo1);
     $email = trim($_POST['email']);
-    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-    if ($users->check_email($email)){
-        $error = 'Неверно указана почта';
+    $password = trim($_POST['password']);
+    if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        $email_error = 1;
+        $error = 'Формат почты неправильный';
     }
-    if ($users->check_user($email, $password)){
+    if ($users->check_email($email)){
+        $email_error = 1;
+        $error = 'Такого пользователя не существует. Неверная почта.';
+    }
+    if (!$users->check_user($email, $password)){
+        $email_error = 1;
+        $pass_error = 1;
         $error = 'Неверный логин или пароль';
     }
     if (!isset($error)){
         $_SESSION['id'] = $users->get_id($email);
+        $_SESSION['limit'] = 0;
         header('Location: main_page.php');
     }
 }
@@ -41,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" and !empty($_POST)){
         <div id="login-form">
             <h2>Авторизация</h2>
             <form id="login-form" action="index.php" method="POST">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required placeholder="Введите ваш email">
+                <label for="email" >Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Введите ваш email" <?php if(isset($email_error)){echo('style="background-color: red"');} ?>>
 
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password" required placeholder="Введите ваш пароль">
+                <input type="password" id="password" name="password" required placeholder="Введите ваш пароль" <?php if(isset($pass_error)){echo('style="background-color: red"');} ?>>
 
                 <button type="submit">Войти</button>
 

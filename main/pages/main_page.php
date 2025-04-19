@@ -1,3 +1,7 @@
+<?php 
+
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -47,13 +51,13 @@
                     </tr>
                 </tbody>
             </table>
-            <a href="/book/add">Добавить книгу</a>
+            <a href="" >Добавить книгу</a>
         </div>
 
         <!-- Форма добавления/редактирования книги -->
-        <div id="book-form" class="section" style="display: none;">
+        <div id="book-form" class="section" >
             <h2>Добавить/Редактировать книгу</h2>
-            <form action="/book/save" method="POST" enctype="multipart/form-data">
+            <form action="../php/add_book.php" method="POST" enctype="multipart/form-data">
                 <label for="title">Название книги:</label>
                 <input type="text" id="title" name="title" required maxlength="100">
 
@@ -62,9 +66,9 @@
 
                 <label for="genre">Жанр:</label>
                 <select id="genre" name="genre" required>
-                    <option value="fiction">Фантастика</option>
-                    <option value="non-fiction">Нон-фикшн</option>
-                    <option value="mystery">Детектив</option>
+                    <option>Фантастика</option>
+                    <option>Нон-фикшн</option>
+                    <option>Детектив</option>
                     <!-- Другие жанры -->
                 </select>
 
@@ -85,7 +89,7 @@
         </div>
 
         <!-- Просмотр книги -->
-        <div id="book-view" class="section" style="display: none;">
+        <div id="book-view" class="section" >
             <h2>Просмотр книги</h2>
             <h3>Название книги</h3>
             <p>Автор: Автор книги</p>

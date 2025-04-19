@@ -1,26 +1,27 @@
 <?php 
+include('config.php');
 
-class Users{
+# класс для работы с таблицей books
+
+class Books{
     private $pdo;
 
     public function __construct($pdo){
         $this->pdo = $pdo;
     }
 
-    # функция для проверки уникальности почты
+    # добавление элементов
 
-    public function check_email($email){
+    public function add($user_id, $genre, $author, $year_of_publication, $path_to_cover, $last_page){
         try{
-            $sql = "SELECT * FROM users WHERE email = :email";
+            $sql = "INSERT INTO books(user_id, genre, author, year_of_publication, path_to_cover, last_page) VALUES(:user_id, :genre, :author, :year_of_publication, :path_to_cover, :last_page)";
             $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['email' => $email]);
-            $result = $stmt->fetchAll();
-            return count($result) === 0;
+            $stmt->execute(['user_id' => $user_id, 'genre' => $genre, 'author' => $author, 'year_of_publication' => $year_of_publication, 'path_to_cover' => $path_to_cover, 'last_page' => $last_page]);
         }catch (PDOException $e){
             echo('Ошибка в users' . $e->getMessage());
-            return false;
         }
     }
+
 
     # проверка соответствия логина и пароля
 
@@ -30,12 +31,11 @@ class Users{
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute(['email' => $email]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (password_verify($password, $result['password']) == true){
-                return 1;
-            };
-            return 0;
-        }
-        catch (PDOException $e){
+            if (password_verify($password, $result['password'])){
+                return true;
+            }
+            return false;
+        }catch (PDOException $e){
             echo('Ошибка в users' . $e->getMessage());
             return false;
         }
@@ -66,21 +66,10 @@ class Users{
             return $result['id'];
         }catch (PDOException $e){
             echo('Ошибка в users' . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function get_all($id){
-        try{
-            $sql = "SELECT * FROM users WHERE id = :id";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['id' => $id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result;
-        }catch (PDOException $e){
-            echo('Ошибка в users' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 }
+
+
 ?>
